@@ -66,8 +66,9 @@ public enum Feature
 
 public class XRProcessor : MonoBehaviour
 {
-    public bool displayErrors = true;
-    public Dictionary<XRNode, List<InputDevice>> devices = new Dictionary<XRNode, List<InputDevice>>();
+    public bool displayDebug;
+    public static bool displayErrors;
+    public static Dictionary<XRNode, List<InputDevice>> devices = new Dictionary<XRNode, List<InputDevice>>();
 
     private void Start()
     {
@@ -79,13 +80,14 @@ public class XRProcessor : MonoBehaviour
 
     private void Update()
     {
+        displayErrors = displayDebug;
         foreach (XRNode node in System.Enum.GetValues(typeof(XRNode)))
         {
             InputDevices.GetDevicesAtXRNode(node, devices[node]);
         }
     }
 
-    public void PollFeature(XRNode node, Feature feature, out bool out_bool)
+    public static void PollFeature(XRNode node, Feature feature, out bool out_bool)
     {
         if (devices[node].Count == 1)
         {
@@ -180,7 +182,7 @@ public class XRProcessor : MonoBehaviour
             out_bool = false;
         }
     }
-    public void PollFeature(XRNode node, Feature feature, out Eyes out_eyes)
+    public static void PollFeature(XRNode node, Feature feature, out Eyes out_eyes)
     {
         if (devices[node].Count == 1)
         {
@@ -205,7 +207,7 @@ public class XRProcessor : MonoBehaviour
             out_eyes = new Eyes();
         }
     }
-    public void PollFeature(XRNode node, Feature feature, out float out_float)
+    public static void PollFeature(XRNode node, Feature feature, out float out_float)
     {
         if (devices[node].Count == 1)
         {
@@ -286,7 +288,7 @@ public class XRProcessor : MonoBehaviour
             out_float = 0;
         }
     }
-    public void PollFeature(XRNode node, Feature feature, out Hand out_hand)
+    public static void PollFeature(XRNode node, Feature feature, out Hand out_hand)
     {
         if (devices[node].Count == 1)
         {
@@ -311,7 +313,7 @@ public class XRProcessor : MonoBehaviour
             out_hand = new Hand();
         }
     }
-    public void PollFeature(XRNode node, Feature feature, out InputTrackingState out_input_tracking_state)
+    public static void PollFeature(XRNode node, Feature feature, out InputTrackingState out_input_tracking_state)
     {
         if (devices[node].Count == 1)
         {
@@ -336,7 +338,7 @@ public class XRProcessor : MonoBehaviour
             out_input_tracking_state = InputTrackingState.None;
         }
     }
-    public void PollFeature(XRNode node, Feature feature, out Quaternion out_quaternion)
+    public static void PollFeature(XRNode node, Feature feature, out Quaternion out_quaternion)
     {
         if (devices[node].Count == 1)
         {
@@ -390,7 +392,7 @@ public class XRProcessor : MonoBehaviour
             out_quaternion = new Quaternion();
         }
     }
-    public void PollFeature(XRNode node, Feature feature, out Vector2 out_vector2)
+    public static void PollFeature(XRNode node, Feature feature, out Vector2 out_vector2)
     {
         if (devices[node].Count == 1)
         {
@@ -429,7 +431,7 @@ public class XRProcessor : MonoBehaviour
             out_vector2 = new Vector2();
         }
     }
-    public void PollFeature(XRNode node, Feature feature, out Vector3 out_vector3)
+    public static void PollFeature(XRNode node, Feature feature, out Vector3 out_vector3)
     {
         if (devices[node].Count == 1)
         {
@@ -622,7 +624,7 @@ public class XRProcessor : MonoBehaviour
         }
     }
 
-    void ErrorMessage(string s)
+    static void ErrorMessage(string s)
     {
         if(displayErrors)
         {
