@@ -6,6 +6,7 @@ using UnityEditor;
 public class XRPlayerController : MonoBehaviour
 {
     public bool controlsMove = true;
+    public bool doGravityWithoutMove;
     public bool controlsRotate = true;
     public bool moveRelativeToFacing;
     public bool pressXRButtons = true;
@@ -28,7 +29,12 @@ public class XRPlayerController : MonoBehaviour
     public float buttonFloatSensitivity = 0.3f;
     public List<ButtonInteractors> buttonInteractors;
 
+    public bool teleport;
+    public List<ButtonInteractors> teleportInteractors;
+    public LayerMask teleportMask;
+
     Dictionary<ButtonInteractors, bool> buttonInteractorStates; // For each interactor, the bool shows whether it was pressed
+    Dictionary<ButtonInteractors, bool> teleportInteractorStates; // For each interactor, the bool shows whether it was pressed
 
     public struct ControlValues
     {
@@ -60,9 +66,11 @@ public class XRPlayerController : MonoBehaviour
 
         // Initialize all to false
         buttonInteractorStates = new Dictionary<ButtonInteractors, bool>();
-        for(int i = 0; i < 9; i++)
+        teleportInteractorStates = new Dictionary<ButtonInteractors, bool>();
+        for (int i = 0; i < 9; i++)
         {
             buttonInteractorStates[(ButtonInteractors)i] = false;
+            teleportInteractorStates[(ButtonInteractors)i] = false;
         }
     }
 
@@ -80,6 +88,7 @@ public class XRPlayerController : MonoBehaviour
 
         // Debug.DrawRay(mainCamera.transform.position, fProj * 20,Color.red);
         // Debug.DrawRay(mainCamera.transform.position, rProj * 20,Color.blue);
+
         if (controlsRotate)
         {
             // Preprocess input data
@@ -101,7 +110,7 @@ public class XRPlayerController : MonoBehaviour
                 rotateFlicked = false;
             }
         }
-        if (controlsMove)
+        if (controlsMove || doGravityWithoutMove)
         {
             // Preprocess input data
             Vector2 rawStickData = controlValues.leftHandJoystick;
@@ -124,13 +133,19 @@ public class XRPlayerController : MonoBehaviour
             {
                 velocityY = -0.1f;
             }
+
+            if (!controlsMove)
+            {
+                moveData = Vector3.zero;
+            }
+
             moveData.y = velocityY;
             controller.Move(moveData * Time.deltaTime);
         }
 
-        xrLaserPointer.interactWithXRButtons = pressXRButtons;
         if (pressXRButtons && xrLaserPointer != null && xrLaserPointer.enabled)
         {
+            xrLaserPointer.interactWithXRButtons = pressXRButtons;
             bool buttonPressed = false;
             bool buttonReleased = false;
             foreach(var interactor in buttonInteractors)
@@ -146,6 +161,26 @@ public class XRPlayerController : MonoBehaviour
             {
                 // Send button released if currently hovering over button
                 xrLaserPointer.ReleaseXRButton();
+            }
+        }
+        if (teleport && xrLaserPointer != null && xrLaserPointer.enabled)
+        {
+            bool buttonPressed = false;
+            bool buttonReleased = false;
+            foreach (var interactor in teleportInteractors)
+            {
+                UpdateInteractionsMap(interactor, ref teleportInteractorStates, ref buttonPressed, ref buttonReleased);
+            }
+            if (buttonReleased)
+            {
+                RaycastHit hit;
+                if(xrLaserPointer.getRaycastHit(out hit))
+                {
+                    if (teleportMask == (teleportMask | (1 << hit.collider.gameObject.layer))) // If collider is in the layermask, we can teleport to it
+                    {
+                        controller.Move(hit.point - this.transform.position + new Vector3(0, controller.height/(float)2, 0));
+                    }
+                }
             }
         }
     }
