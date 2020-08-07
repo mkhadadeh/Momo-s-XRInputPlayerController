@@ -1067,7 +1067,7 @@ PrefabInstance:
     - target: {fileID: 5700796501168053370, guid: 6f755b469d5e15f43a67db5b2cf502f0,
         type: 3}
       propertyPath: pressXRButtons
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5700796501168053370, guid: 6f755b469d5e15f43a67db5b2cf502f0,
         type: 3}
@@ -1077,7 +1077,7 @@ PrefabInstance:
     - target: {fileID: 5700796501168053370, guid: 6f755b469d5e15f43a67db5b2cf502f0,
         type: 3}
       propertyPath: controlsMove
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5700796501168053370, guid: 6f755b469d5e15f43a67db5b2cf502f0,
         type: 3}
@@ -1107,7 +1107,7 @@ PrefabInstance:
     - target: {fileID: 5700796501168053370, guid: 6f755b469d5e15f43a67db5b2cf502f0,
         type: 3}
       propertyPath: doGravityWithoutMove
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5700796501366047430, guid: 6f755b469d5e15f43a67db5b2cf502f0,
         type: 3}
