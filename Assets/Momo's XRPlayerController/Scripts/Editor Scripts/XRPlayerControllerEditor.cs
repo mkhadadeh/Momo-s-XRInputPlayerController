@@ -7,34 +7,6 @@ using UnityEditorInternal;
 [CustomEditor(typeof(XRPlayerController))]
 public class XRPlayerControllerEditor : Editor
 {
-    private ReorderableList buttonInteractorsList;
-    private ReorderableList teleportInteractorsList;
-    private void OnEnable()
-    {
-        buttonInteractorsList = new ReorderableList(serializedObject, serializedObject.FindProperty("buttonInteractors"), true, true, true, true);
-        buttonInteractorsList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-        {
-            var element = buttonInteractorsList.serializedProperty.GetArrayElementAtIndex(index);
-            rect.y += 2;
-            EditorGUI.PropertyField(new Rect(rect.x, rect.y, 200, EditorGUIUtility.singleLineHeight), element, GUIContent.none);
-        };
-        buttonInteractorsList.drawHeaderCallback = (Rect rect) =>
-        {
-            EditorGUI.LabelField(rect, "These Interactions Will Trigger XR Buttons");
-        };
-
-        teleportInteractorsList = new ReorderableList(serializedObject, serializedObject.FindProperty("teleportInteractors"), true, true, true, true);
-        teleportInteractorsList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-        {
-            var element = teleportInteractorsList.serializedProperty.GetArrayElementAtIndex(index);
-            rect.y += 2;
-            EditorGUI.PropertyField(new Rect(rect.x, rect.y, 200, EditorGUIUtility.singleLineHeight), element, GUIContent.none);
-        };
-        teleportInteractorsList.drawHeaderCallback = (Rect rect) =>
-        {
-            EditorGUI.LabelField(rect, "These Interactions Will Trigger Teleportation");
-        };
-    }
     public override void OnInspectorGUI()
     {
         var xrPlayerController = target as XRPlayerController;
@@ -95,14 +67,9 @@ public class XRPlayerControllerEditor : Editor
             EditorGUILayout.PropertyField(xrLaserPointerProperty, new GUIContent("XR Laser Pointer", "The XR Laser Pointer object that will trigger the buttons"));
         }
 
-        if (xrPlayerController.pressXRButtons)
-        {
-            buttonInteractorsList.DoLayoutList();
-        }
         if(xrPlayerController.teleport)
         {
             EditorGUILayout.PropertyField(teleportMaskProperty, new GUIContent("Teleport Mask", "Layer mask for any collider that can be teleported to"));
-            teleportInteractorsList.DoLayoutList();
         }
 
         serializedObject.ApplyModifiedProperties();

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class XRAvatar : MonoBehaviour
 {
-    public XRPlayerController inputs;
+    public XRPlayerController playerController;
 
     public Transform head;
     public Transform rightHand;
@@ -12,11 +12,11 @@ public class XRAvatar : MonoBehaviour
 
     void Update()
     {
-        head.localPosition = inputs.controlValues.headPos;
-        head.localRotation = inputs.controlValues.headRot;
-        rightHand.localPosition = inputs.controlValues.rightHandPos;
-        rightHand.localRotation = inputs.controlValues.rightHandRot;
-        leftHand.localPosition = inputs.controlValues.leftHandPos;
-        leftHand.localRotation = inputs.controlValues.leftHandRot;
+        head.localPosition = playerController.inputActions.XRAvatar.HeadPosition.ReadValue<Vector3>();
+        head.localRotation = playerController.inputActions.XRAvatar.HeadRotation.ReadValue<Quaternion>();
+        rightHand.localPosition = playerController.inputActions.XRAvatar.RightHandPosition.ReadValue<Vector3>();
+        rightHand.localRotation = playerController.inputActions.XRAvatar.RightHandRotation.ReadValue<Quaternion>();
+        leftHand.localPosition = playerController.inputActions.XRAvatar.LeftHandPosition.ReadValue<Vector3>();
+        leftHand.localRotation = playerController.inputActions.XRAvatar.LeftHandRotation.ReadValue<Quaternion>();
     }
 }

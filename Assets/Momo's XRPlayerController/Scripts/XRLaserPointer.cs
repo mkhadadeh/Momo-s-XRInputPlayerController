@@ -17,8 +17,6 @@ public class XRLaserPointer : MonoBehaviour
     LineRenderer laserLine;
     Vector3[] laserPositions;
 
-    [HideInInspector]
-    public bool interactWithXRButtons;
     XRButton hoveredButton;
 
     // Start is called before the first frame update
@@ -60,13 +58,11 @@ public class XRLaserPointer : MonoBehaviour
             laserPositions[1] = transform.position + (transform.forward * maxDistance);
 
             // Remove references to anything that is currently being hovered on
-            if (interactWithXRButtons)
+
+            if (hoveredButton != null)
             {
-                if (hoveredButton != null)
-                {
-                    hoveredButton.ChangeState(XRButton.ButtonState.UP);
-                    hoveredButton = null;
-                }
+                hoveredButton.ChangeState(XRButton.ButtonState.UP);
+                hoveredButton = null;
             }
         }
         // Render laser
@@ -77,14 +73,11 @@ public class XRLaserPointer : MonoBehaviour
         // Interact with objects
         if (hitInfo.collider != null) {
             // Interact with XR buttons if allowed
-            if (interactWithXRButtons)
+            XRButton currHitButton = hitInfo.collider.gameObject.GetComponent<XRButton>();
+            if (hoveredButton == null && rayHitting && currHitButton != null)
             {
-                XRButton currHitButton = hitInfo.collider.gameObject.GetComponent<XRButton>();
-                if (hoveredButton == null && rayHitting && currHitButton != null)
-                {
-                    hoveredButton = currHitButton;
-                    hoveredButton.ChangeState(XRButton.ButtonState.HOVERED);
-                }
+                hoveredButton = currHitButton;
+                hoveredButton.ChangeState(XRButton.ButtonState.HOVERED);
             }
         }
 
@@ -92,7 +85,7 @@ public class XRLaserPointer : MonoBehaviour
 
     public void PressXRButton()
     {
-        if(interactWithXRButtons && hoveredButton != null && hoveredButton.state != XRButton.ButtonState.DISABLED)
+        if(hoveredButton != null && hoveredButton.state != XRButton.ButtonState.DISABLED)
         {
             hoveredButton.ChangeState(XRButton.ButtonState.PRESSED);
         }
@@ -100,7 +93,7 @@ public class XRLaserPointer : MonoBehaviour
 
     public void ReleaseXRButton()
     {
-        if (interactWithXRButtons && hoveredButton != null && hoveredButton.state != XRButton.ButtonState.DISABLED)
+        if (hoveredButton != null && hoveredButton.state != XRButton.ButtonState.DISABLED)
         {
             hoveredButton.ChangeState(XRButton.ButtonState.HOVERED);
         }
