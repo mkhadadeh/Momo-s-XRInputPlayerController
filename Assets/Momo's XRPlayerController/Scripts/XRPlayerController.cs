@@ -24,6 +24,9 @@ public class XRPlayerController : MonoBehaviour
     Vector3 fProj;
     Vector3 rProj;
     float velocityY;
+
+    Vector3 lateralMoveData;
+
     bool rotateFlicked;
     public float rotationAngle = 30;
     float currentSelectedRotation;
@@ -59,59 +62,23 @@ public class XRPlayerController : MonoBehaviour
         // Debug.DrawRay(mainCamera.transform.position, fProj * 20,Color.red);
         // Debug.DrawRay(mainCamera.transform.position, rProj * 20,Color.blue);
 
-        if (controlsRotate)
+
+        // TODO: Make Character Controller Move down slopes naturally rather than stagger
+        if (doGravityWithoutMove || controlsMove)
         {
-            // Preprocess input data
-            Vector2 rawStickData = inputActions.XRPlayerController.RotateCamera.ReadValue<Vector2>();
-            // Create stick deadzone
-            if (Mathf.Abs(rawStickData.x) <= stickDeadzone)
-            {
-                rawStickData.x = 0;
-            }
-            if (!rotateFlicked && rawStickData.x != 0)
-            {
-                int direction = (int)Mathf.Sign(rawStickData.x); //-1 = left. 1 = right.
-                mainCamera.transform.parent.RotateAround(mainCamera.transform.position, Vector3.up, rotationAngle * direction);
-                currentSelectedRotation += rotationAngle * direction;
-                rotateFlicked = true;
-            }
-            if (rawStickData.magnitude < stickDeadzone)
-            {
-                rotateFlicked = false;
-            }
-        }
-        if (controlsMove || doGravityWithoutMove)
-        {
-            // Preprocess input data
-            Vector2 rawStickData = inputActions.XRPlayerController.Move.ReadValue<Vector2>();
-            // Create stick dead zone
-            if (Mathf.Abs(rawStickData.x) <= stickDeadzone)
-            {
-                rawStickData.x = 0;
-            }
-            if (Mathf.Abs(rawStickData.y) <= stickDeadzone)
-            {
-                rawStickData.y = 0;
-            }
-            Vector3 moveData = moveSpeed * Vector3.Normalize(fProj * rawStickData.y + rProj * rawStickData.x);
             velocityY += gravity * Time.deltaTime;
             if (velocityY < termVel && termVel != 0)
             {
                 velocityY = termVel;
             }
+            
             if (controller.isGrounded)
             {
                 velocityY = -0.1f;
             }
-
-            if (!controlsMove)
-            {
-                moveData = Vector3.zero;
-            }
-
-            moveData.y = velocityY;
-            controller.Move(moveData * Time.deltaTime);
         }
+        controller.Move(new Vector3(lateralMoveData.x, velocityY, lateralMoveData.z) * Time.deltaTime);
+
     }
 
     public void SendHaptics(bool leftHand, float amplitude, float duration)
@@ -138,6 +105,8 @@ public class XRPlayerController : MonoBehaviour
         inputActions.XRPlayerController.Teleport.canceled += context => Teleport(context);
         inputActions.XRPlayerController.Interact.performed += context => Interact(context);
         inputActions.XRPlayerController.Interact.canceled += context => EndInteraction(context);
+        inputActions.XRPlayerController.Move.performed += context => ProcessLateralMove(context);
+        inputActions.XRPlayerController.RotateCamera.performed += context => ProcessXRRotate(context);
     }
 
 
@@ -146,6 +115,8 @@ public class XRPlayerController : MonoBehaviour
         inputActions.XRPlayerController.Teleport.canceled -= context => Teleport(context);
         inputActions.XRPlayerController.Interact.performed -= context => Interact(context);
         inputActions.XRPlayerController.Interact.canceled -= context => EndInteraction(context);
+        inputActions.XRPlayerController.Move.performed += context => ProcessLateralMove(context);
+        inputActions.XRPlayerController.RotateCamera.performed += context => ProcessXRRotate(context);
         inputActions.Disable();
     }
 
@@ -162,6 +133,7 @@ public class XRPlayerController : MonoBehaviour
                 }
             }
         }
+
     }
 
     void Interact(InputAction.CallbackContext ctx)
@@ -182,5 +154,52 @@ public class XRPlayerController : MonoBehaviour
         }
     }
 
+    void ProcessLateralMove(InputAction.CallbackContext ctx)
+    {
+        if (controlsMove)
+        {
+            // Preprocess input data
+            Vector2 rawStickData = ctx.ReadValue<Vector2>();
+            // Create stick dead zone
+            if (Mathf.Abs(rawStickData.x) <= stickDeadzone)
+            {
+                rawStickData.x = 0;
+            }
+            if (Mathf.Abs(rawStickData.y) <= stickDeadzone)
+            {
+                rawStickData.y = 0;
+            }
+            lateralMoveData = moveSpeed * Vector3.Normalize(fProj * rawStickData.y + rProj * rawStickData.x);
+        }
+        else
+        {
+            lateralMoveData = Vector3.zero;
+        }
+    }
+
+    void ProcessXRRotate(InputAction.CallbackContext ctx)
+    {
+        if (controlsRotate)
+        {
+            // Preprocess input data
+            Vector2 rawStickData = inputActions.XRPlayerController.RotateCamera.ReadValue<Vector2>();
+            // Create stick deadzone
+            if (Mathf.Abs(rawStickData.x) <= stickDeadzone)
+            {
+                rawStickData.x = 0;
+            }
+            if (!rotateFlicked && rawStickData.x != 0)
+            {
+                int direction = (int)Mathf.Sign(rawStickData.x); //-1 = left. 1 = right.
+                mainCamera.transform.parent.RotateAround(mainCamera.transform.position, Vector3.up, rotationAngle * direction);
+                currentSelectedRotation += rotationAngle * direction;
+                rotateFlicked = true;
+            }
+            if (rawStickData.magnitude < stickDeadzone)
+            {
+                rotateFlicked = false;
+            }
+        }
+    }
 
 }
