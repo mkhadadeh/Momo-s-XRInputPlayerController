@@ -12,6 +12,8 @@ public class XRAvatar : MonoBehaviour
 
     void Update()
     {
+        head.localPosition = playerController.inputActions.XRAvatar.HeadPosition.ReadValue<Vector3>();
+        head.localRotation = playerController.inputActions.XRAvatar.HeadRotation.ReadValue<Quaternion>();
         rightHand.localPosition = playerController.inputActions.XRAvatar.RightHandPosition.ReadValue<Vector3>();
         rightHand.localRotation = playerController.inputActions.XRAvatar.RightHandRotation.ReadValue<Quaternion>();
         leftHand.localPosition = playerController.inputActions.XRAvatar.LeftHandPosition.ReadValue<Vector3>();

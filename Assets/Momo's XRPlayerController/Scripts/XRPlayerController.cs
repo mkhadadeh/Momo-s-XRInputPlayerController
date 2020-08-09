@@ -19,13 +19,17 @@ public class XRPlayerController : MonoBehaviour
     public Camera mainCamera;
     public float gravity = -9.81f;
     public float moveSpeed = 2;
-    public float stickDeadzone = 0.3f;
     public float termVel = 0f;
+    public float heightPadding = 0.05f;
+
     Vector3 fProj;
     Vector3 rProj;
+    Vector3 fDir;
+    Vector3 rDir;
     float velocityY;
 
     Vector3 lateralMoveData;
+    RaycastHit groundHit;
 
     bool rotateFlicked;
     public float rotationAngle = 30;
@@ -41,6 +45,7 @@ public class XRPlayerController : MonoBehaviour
 
     public bool teleport;
     public LayerMask teleportMask;
+    public LayerMask groundMask;
 
     void Start() {
         velocityY = 0;
@@ -51,16 +56,41 @@ public class XRPlayerController : MonoBehaviour
     void Update()
     {
         // Calculate forward and right vectors
-        if(moveRelativeToFacing) {
+        if (moveRelativeToFacing) {
             fProj = Vector3.Normalize(Vector3.Scale(mainCamera.transform.forward, new Vector3(1,0,1)));
         }
         else {
             fProj = Quaternion.Euler(0, currentSelectedRotation, 0) * new Vector3(0,0,1);
         }
         rProj = Vector3.Normalize(Vector3.Cross(new Vector3(0,1,0),fProj));
+        if(Physics.Raycast(transform.position, -Vector3.up, out groundHit, controller.height + heightPadding, groundMask))
+        {
+            Debug.DrawLine(groundHit.point, groundHit.point + groundHit.normal * 4, Color.gray);
+            fDir = Vector3.Cross(groundHit.normal, -rProj);
+            rDir = Vector3.Cross(groundHit.normal, fProj);
+        }
+        else
+        {
+            fDir = fProj;
+            rDir = rProj;
+        }
+        
+        //Debug.DrawLine(transform.position, transform.position - (Vector3.up * (controller.height + heightPadding)),Color.green);
 
-        // Debug.DrawRay(mainCamera.transform.position, fProj * 20,Color.red);
-        // Debug.DrawRay(mainCamera.transform.position, rProj * 20,Color.blue);
+        if (controlsMove)
+        {
+            // Preprocess input data
+            Vector2 rawStickData = inputActions.XRPlayerController.Move.ReadValue<Vector2>();
+            // Create stick dead zone
+            lateralMoveData = moveSpeed * Vector3.Normalize(fDir * rawStickData.y + rDir * rawStickData.x);
+        }
+        else
+        {
+            lateralMoveData = Vector3.zero;
+        }
+
+        //Debug.DrawRay(mainCamera.transform.position, fDir * 20,Color.red);
+        //Debug.DrawRay(mainCamera.transform.position, rDir * 20,Color.blue);
 
 
         // TODO: Make Character Controller Move down slopes naturally rather than stagger
@@ -71,13 +101,13 @@ public class XRPlayerController : MonoBehaviour
             {
                 velocityY = termVel;
             }
-            
-            if (controller.isGrounded)
+
+            if (controller.isGrounded && lateralMoveData.y <= 0)
             {
                 velocityY = -0.1f;
             }
         }
-        controller.Move(new Vector3(lateralMoveData.x, velocityY, lateralMoveData.z) * Time.deltaTime);
+        controller.Move(new Vector3(lateralMoveData.x, lateralMoveData.y + velocityY, lateralMoveData.z) * Time.deltaTime);
 
     }
 
@@ -105,7 +135,6 @@ public class XRPlayerController : MonoBehaviour
         inputActions.XRPlayerController.Teleport.canceled += context => Teleport(context);
         inputActions.XRPlayerController.Interact.performed += context => Interact(context);
         inputActions.XRPlayerController.Interact.canceled += context => EndInteraction(context);
-        inputActions.XRPlayerController.Move.performed += context => ProcessLateralMove(context);
         inputActions.XRPlayerController.RotateCamera.performed += context => ProcessXRRotate(context);
     }
 
@@ -115,7 +144,6 @@ public class XRPlayerController : MonoBehaviour
         inputActions.XRPlayerController.Teleport.canceled -= context => Teleport(context);
         inputActions.XRPlayerController.Interact.performed -= context => Interact(context);
         inputActions.XRPlayerController.Interact.canceled -= context => EndInteraction(context);
-        inputActions.XRPlayerController.Move.performed += context => ProcessLateralMove(context);
         inputActions.XRPlayerController.RotateCamera.performed += context => ProcessXRRotate(context);
         inputActions.Disable();
     }
@@ -138,7 +166,6 @@ public class XRPlayerController : MonoBehaviour
 
     void Interact(InputAction.CallbackContext ctx)
     {
-        Debug.Log(ctx);
         if (pressXRButtons && xrLaserPointer != null && xrLaserPointer.enabled)
         {
             xrLaserPointer.PressXRButton();
@@ -154,40 +181,12 @@ public class XRPlayerController : MonoBehaviour
         }
     }
 
-    void ProcessLateralMove(InputAction.CallbackContext ctx)
-    {
-        if (controlsMove)
-        {
-            // Preprocess input data
-            Vector2 rawStickData = ctx.ReadValue<Vector2>();
-            // Create stick dead zone
-            if (Mathf.Abs(rawStickData.x) <= stickDeadzone)
-            {
-                rawStickData.x = 0;
-            }
-            if (Mathf.Abs(rawStickData.y) <= stickDeadzone)
-            {
-                rawStickData.y = 0;
-            }
-            lateralMoveData = moveSpeed * Vector3.Normalize(fProj * rawStickData.y + rProj * rawStickData.x);
-        }
-        else
-        {
-            lateralMoveData = Vector3.zero;
-        }
-    }
-
     void ProcessXRRotate(InputAction.CallbackContext ctx)
     {
         if (controlsRotate)
         {
             // Preprocess input data
             Vector2 rawStickData = inputActions.XRPlayerController.RotateCamera.ReadValue<Vector2>();
-            // Create stick deadzone
-            if (Mathf.Abs(rawStickData.x) <= stickDeadzone)
-            {
-                rawStickData.x = 0;
-            }
             if (!rotateFlicked && rawStickData.x != 0)
             {
                 int direction = (int)Mathf.Sign(rawStickData.x); //-1 = left. 1 = right.
@@ -195,7 +194,7 @@ public class XRPlayerController : MonoBehaviour
                 currentSelectedRotation += rotationAngle * direction;
                 rotateFlicked = true;
             }
-            if (rawStickData.magnitude < stickDeadzone)
+            if (rawStickData.magnitude == 0)
             {
                 rotateFlicked = false;
             }

@@ -57,73 +57,18 @@ public class @XRInputActions : IInputActionCollection, IDisposable
                     ""id"": ""6c58babc-8346-44fd-a263-013ba2be3acd"",
                     ""path"": ""<XRController>{LeftHand}/joystick"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": ""XR Controller"",
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""WASD"",
-                    ""id"": ""5204c3f5-6287-490e-a396-33dca5909bdb"",
-                    ""path"": ""2DVector"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Move"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""up"",
-                    ""id"": ""a20007bb-3b91-4b36-8900-e27b3065f148"",
-                    ""path"": ""<Keyboard>/w"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Mouse And Keyboard"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""06f46a4f-3635-4c82-bae8-06cbfec6bc56"",
-                    ""path"": ""<Keyboard>/s"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Mouse And Keyboard"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""left"",
-                    ""id"": ""da047f5c-e9fb-467e-a786-62f8d99b1401"",
-                    ""path"": ""<Keyboard>/a"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Mouse And Keyboard"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""6a1d122f-4a39-4df3-94b7-0da2be428e3d"",
-                    ""path"": ""<Keyboard>/d"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Mouse And Keyboard"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": """",
                     ""id"": ""6b69dad4-17bc-42e8-90a1-e754ecb60e30"",
                     ""path"": ""<XRController>{RightHand}/joystick"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": ""XR Controller"",
                     ""action"": ""Rotate Camera"",
                     ""isComposite"": false,
@@ -318,6 +263,52 @@ public class @XRInputActions : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Blah"",
+            ""id"": ""e406d241-99cb-4940-b933-9d6c0e7e532b"",
+            ""actions"": [
+                {
+                    ""name"": ""Blah1"",
+                    ""type"": ""Button"",
+                    ""id"": ""4fdf64be-1a56-4dab-846a-c02adf30646c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Blah2"",
+                    ""type"": ""Button"",
+                    ""id"": ""8b73939e-9b1e-40da-976c-be69dfbba788"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""6b6a9b44-285a-4cd2-824c-cd400ce88700"",
+                    ""path"": ""<Keyboard>/leftBracket"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Blah1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f617c009-9cb7-4296-819b-0fd69a05befc"",
+                    ""path"": ""<Keyboard>/rightBracket"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Blah2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -369,6 +360,10 @@ public class @XRInputActions : IInputActionCollection, IDisposable
         m_XRAvatar_LeftHandRotation = m_XRAvatar.FindAction("LeftHandRotation", throwIfNotFound: true);
         m_XRAvatar_RightHandPosition = m_XRAvatar.FindAction("RightHandPosition", throwIfNotFound: true);
         m_XRAvatar_RightHandRotation = m_XRAvatar.FindAction("RightHandRotation", throwIfNotFound: true);
+        // Blah
+        m_Blah = asset.FindActionMap("Blah", throwIfNotFound: true);
+        m_Blah_Blah1 = m_Blah.FindAction("Blah1", throwIfNotFound: true);
+        m_Blah_Blah2 = m_Blah.FindAction("Blah2", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -544,6 +539,47 @@ public class @XRInputActions : IInputActionCollection, IDisposable
         }
     }
     public XRAvatarActions @XRAvatar => new XRAvatarActions(this);
+
+    // Blah
+    private readonly InputActionMap m_Blah;
+    private IBlahActions m_BlahActionsCallbackInterface;
+    private readonly InputAction m_Blah_Blah1;
+    private readonly InputAction m_Blah_Blah2;
+    public struct BlahActions
+    {
+        private @XRInputActions m_Wrapper;
+        public BlahActions(@XRInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Blah1 => m_Wrapper.m_Blah_Blah1;
+        public InputAction @Blah2 => m_Wrapper.m_Blah_Blah2;
+        public InputActionMap Get() { return m_Wrapper.m_Blah; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(BlahActions set) { return set.Get(); }
+        public void SetCallbacks(IBlahActions instance)
+        {
+            if (m_Wrapper.m_BlahActionsCallbackInterface != null)
+            {
+                @Blah1.started -= m_Wrapper.m_BlahActionsCallbackInterface.OnBlah1;
+                @Blah1.performed -= m_Wrapper.m_BlahActionsCallbackInterface.OnBlah1;
+                @Blah1.canceled -= m_Wrapper.m_BlahActionsCallbackInterface.OnBlah1;
+                @Blah2.started -= m_Wrapper.m_BlahActionsCallbackInterface.OnBlah2;
+                @Blah2.performed -= m_Wrapper.m_BlahActionsCallbackInterface.OnBlah2;
+                @Blah2.canceled -= m_Wrapper.m_BlahActionsCallbackInterface.OnBlah2;
+            }
+            m_Wrapper.m_BlahActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Blah1.started += instance.OnBlah1;
+                @Blah1.performed += instance.OnBlah1;
+                @Blah1.canceled += instance.OnBlah1;
+                @Blah2.started += instance.OnBlah2;
+                @Blah2.performed += instance.OnBlah2;
+                @Blah2.canceled += instance.OnBlah2;
+            }
+        }
+    }
+    public BlahActions @Blah => new BlahActions(this);
     private int m_XRControllerSchemeIndex = -1;
     public InputControlScheme XRControllerScheme
     {
@@ -577,5 +613,10 @@ public class @XRInputActions : IInputActionCollection, IDisposable
         void OnLeftHandRotation(InputAction.CallbackContext context);
         void OnRightHandPosition(InputAction.CallbackContext context);
         void OnRightHandRotation(InputAction.CallbackContext context);
+    }
+    public interface IBlahActions
+    {
+        void OnBlah1(InputAction.CallbackContext context);
+        void OnBlah2(InputAction.CallbackContext context);
     }
 }

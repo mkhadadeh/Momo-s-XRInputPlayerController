@@ -499,43 +499,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 736687256}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2fadf230d1919748a9aa21d40f74619, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a2a9c34df4095f47b9ca8f975175f5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Device: 0
+  m_PoseSource: 2
+  m_PoseProviderComponent: {fileID: 0}
   m_TrackingType: 0
   m_UpdateType: 0
-  m_PositionAction:
-    m_Name: Position
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 76674db7-f41f-4bc6-9e28-13fc8846c0d7
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 6878998a-3b90-4df4-ad74-c0b05f06fc88
-      m_Path: <XRHMD>/devicePosition
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Position
-      m_Flags: 0
-  m_RotationAction:
-    m_Name: Rotation
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 1b2de14e-e093-4616-abd0-f44f6b8d45dd
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: c8636959-db5b-4c6e-8ae9-8359f369c50f
-      m_Path: <XRHMD>/deviceRotation
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Rotation
-      m_Flags: 0
+  m_UseRelativeTransform: 0
 --- !u!1 &743278392
 GameObject:
   m_ObjectHideFlags: 0
@@ -1612,6 +1584,11 @@ PrefabInstance:
         type: 3}
       propertyPath: doGravityWithoutMove
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5700796501168053370, guid: 6f755b469d5e15f43a67db5b2cf502f0,
+        type: 3}
+      propertyPath: groundMask.m_Bits
+      value: 512
       objectReference: {fileID: 0}
     - target: {fileID: 5700796501366047430, guid: 6f755b469d5e15f43a67db5b2cf502f0,
         type: 3}
