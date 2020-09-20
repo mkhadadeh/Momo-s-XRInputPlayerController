@@ -93,7 +93,6 @@ public class XRPlayerController : MonoBehaviour
         //Debug.DrawRay(mainCamera.transform.position, rDir * 20,Color.blue);
 
 
-        // TODO: Make Character Controller Move down slopes naturally rather than stagger
         if (doGravityWithoutMove || controlsMove)
         {
             velocityY += gravity * Time.deltaTime;
